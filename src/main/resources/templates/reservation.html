@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reservation page</title>
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <link href="/css/main.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+
+    <script type="text/javascript" src="/js/reservation.js"></script>
+
+    <script>
+        $( document ).ready(function() {
+            console.log( "initializing reservation" );
+            init();
+        });
+    </script>
+
+</head>
+<body>
+
+<p>
+<div class="container" id="reservations">
+    <table id="reservationTable" class="display mx-auto"></table>
+</div>
+</p>
+
+<div class="container">
+    <form>
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control" id="name">
+        </div>
+        <div class="form-group">
+            <label for="nightsNum">How many nights:</label>
+            <input type="text" class="form-control" id="nightsNum">
+        </div>
+        <div class="form-group">
+            <label for="persons">How many person:</label>
+            <input type="number" class="form-control" id="persons">
+        </div>
+
+        <button type="button" class="btn btn-primary" id="create-reservation">Submit</button>
+
+    </form>
+</div>
+
+</body>
+</html>

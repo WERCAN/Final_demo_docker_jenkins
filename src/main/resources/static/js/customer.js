@@ -1,0 +1,173 @@
+var api = "http://localhost:9090/api/customer" ;
+var customerTable;
+
+function init(){
+    console.log('inside init' );
+
+    $("#newCustomerButton").click( function () {
+        console.log("Inside click of newCustomerButton");
+        $('#customerModal').modal('show');
+    });
+
+    $("#editCustomerButton").click( function () {
+        console.log("Inside click of editCustomerButton");
+        // Get the data from selected row and fill fields in modal
+//        $("#name").val('XXXXX');
+//        $("#address").val('ZZZZZZZZ');
+//        $("#age").val(23);
+        if (customerTable.row($('.selected')).data() == undefined) {
+            alert("Select customer first");
+        }else{
+            var customer = customerTable.row($('.selected')).data();
+            $("#id").val(customer.id);
+            $("#name").val(customer.name);
+            $("#address").val(customer.address);
+            $("#age").val(customer.age);
+            $('#customerModal').modal('show');
+        }
+    });
+
+    $("#deleteCustomerButton").click( function () {
+        console.log("Inside click of deleteCustomerButton");
+        if (customerTable.row($('.selected')).data() == undefined) {
+            alert("Select customer first");
+        }else{
+            $('#customerDeleteModal').modal('show');
+        }
+    });
+
+    // Button in modal
+    $("#deleteCustomerConfirmButton").click( function () {
+        console.log("Inside click of deleteCustomerButton");
+        deleteCustomer();
+        $('#customerDeleteModal').modal('hide');
+    });
+
+    // Add submit event to form for new and edit
+    $("#customerForm").on('submit', function() {
+        console.log("Submitting");
+        createCustomer();
+        $('#customerModal').modal('hide');
+    });
+    initCustomerTable();
+    // Get customers from backend and and update table
+    getCustomerData();
+
+    $("#customerTable tbody").on( 'click', 'tr', function () {
+                console.log("Clicking on row");
+                if ( $(this).hasClass('selected') ) {
+                  $(this).removeClass('selected');
+                  // emptyRoomModals();
+                }
+                else {
+                    customerTable.$('tr.selected').removeClass('selected');
+                  // emptyRoomModals();
+                    $(this).addClass('selected');
+                }
+            });
+
+}
+function initCustomerTable() {
+    console.log('inside initCustomerTable' );
+    // Create columns (with titles) for datatable: id, name, address, age
+    columns = [
+        { "title":  "Customer ID",
+            "data": "id" ,
+            "visible": false },
+        { "title":  "Name",
+            "data": "name" },
+        { "title":  "Address",
+            "data": "address" },
+        { "title": "Age",
+            "data": "age"},
+    ];
+    // Define new table with above columns
+    customerTable = $("#customerTable").DataTable( {
+        "order": [[ 0, "asc" ]],
+        "columns": columns
+    });
+
+
+}
+function getCustomerData(){
+    console.log('inside getCustomerData' );
+    // http:/localhost:9090/api/customer
+    // json list of customers
+    $.ajax({
+        url: api,
+        type: "get",
+        dataType: "json",
+        // success: function(customers, textStatus, jqXHR){
+        success: function(customers){
+ //           console.log('Data: ' + customers );
+            if (customers) {
+                customerTable.clear();
+                customerTable.rows.add(customers);
+                customerTable.columns.adjust().draw();
+            }
+        },
+        fail: function (error) {
+            console.log('Error: ' + error);
+        }
+    });
+}
+function createCustomer(){
+    console.log('inside createCustomer' );
+    // Put customer data from page in Javascript object --- SIMILAR TO JSON
+    var customerData = {
+
+            name: $("#name").val(),
+            address: $("#address").val(),
+            age: $("#age").val()
+    }
+    // Transform Javascript object to json
+    var customerJson = JSON.stringify(customerData);
+    console.log(customerJson);
+    $.ajax({
+        url: api,
+        type: "post",
+        data: customerJson,    // json for request body
+        contentType:"application/json; charset=utf-8",   // What we send to frontend
+        dataType: "json",  // get back from frontend
+        // success: function(customer, textStatus, jqXHR){
+        success: function(customer){
+          console.log(customer);
+          // Clear fields in page
+          $("#name").val('');
+          $("#address").val('');
+          $("#age").val('');
+          // Refresh table data
+          getCustomerData();
+        },
+        fail: function (error) {
+          console.log('Error: ' + error);
+        }
+    });
+}
+function deleteCustomer(){
+    if (customerTable.row($('.selected')).data() == undefined) {
+        alert("Select customer first");
+    }else{
+        var customer = customerTable.row($('.selected')).data();
+        // http:9090/api/customer/2
+        console.log(api + '/' + customer.id);
+            $.ajax({
+                url: api + '/' + customer.id,
+                contentType: "application/json",
+                dataType: "text",  // get back from frontend
+                // success: function(customer, textStatus, jqXHR){
+                success: function(message){
+                  console.log(message);
+                  alert("Customer deleted");
+                  // Refresh table data
+                  getCustomerData();
+                },
+                fail: function (error) {
+                  console.log('Error: ' + error);
+                }
+            });
+
+    }
+
+}
+
